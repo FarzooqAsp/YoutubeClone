@@ -210,8 +210,33 @@ const changeCurrentPassword = asyncHandler( async (req, res) => {
     .json(new ApiResponse(200,{},"password update successfully"))
 })
 
+const getcurrentUser = asyncHandler ( async (req, res) => {
+    return res
+    .status(200)
+    .json( new  ApiResponse(
+        200,
+        res.user,
+        "user fetch successfully"
+    ))
+} )
 
+const updateAccountDetail = asyncHandler( async (req, res) => {
+    const {fullName, email} = req.body
+    if(!fullName || !email){
+        throw new apiError(401, "all files are required")
+    }
+    const user = await User.findByIdAndUpdate(req.user?._id,{
+        $set: {
+            fullName,
+            email: email
+        }
+    },{new: true}).select("-password")
+
+    return res.status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"))
+})
 
 export { registerUser, loginUser, logoutUser, 
-    refreshAccessToken, changeCurrentPassword 
+    refreshAccessToken, changeCurrentPassword,
+    getcurrentUser, updateAccountDetail
 }
